@@ -34,7 +34,7 @@ const PostList = () => {
     content = orderedPosts.map((post) => (
       <PostExcerpt key={post.id} post={post} />
     ));
-  } else if (postsStatus === "failde") {
+  } else if (postsStatus === "failed") {
     content = <p>{error}</p>;
   }
 

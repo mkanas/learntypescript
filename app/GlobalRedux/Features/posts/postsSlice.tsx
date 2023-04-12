@@ -10,15 +10,17 @@ import axios from "axios";
 import { RootState } from "../../store";
 import { sub } from "date-fns";
 
-interface PostsFake {
+export interface PostsFake {
   id: number;
   title: string;
   body: string;
-  userId: number;
+  userId: string;
+  date: string;
 }
 
 export interface Posts {
-  Api: PostsFake[];
+  id: string;
+  api: PostsFake[];
   date: string;
   error: string;
   reactions: {
@@ -32,20 +34,36 @@ export interface Posts {
 
 const POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
 
-const initialState = {
+interface InitialState {
+  posts: Posts[];
+  status: "idle" | "succeeded" | "failed" | "loading";
+  error: null | string | undefined;
+}
+
+const initialState: InitialState = {
   posts: [],
   status: "idle",
   error: null,
 };
 
-export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  try {
-    const response = await axios.get(POSTS_URL);
-    return [...response.data];
-  } catch (error) {
-    return error.message;
+export const fetchPosts = createAsyncThunk(
+  "posts/fetchPosts",
+  async (): Promise<Posts[] | string> => {
+    try {
+      const response = await axios.get(POSTS_URL);
+      return [...response.data];
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "message" in error &&
+        typeof error.message === "string"
+      )
+        return error.message;
+      else return "something went error";
+    }
   }
-});
+);
 
 const postsSlice = createSlice({
   name: "posts",
@@ -55,14 +73,19 @@ const postsSlice = createSlice({
       reducer(state, action: PayloadAction<Posts>) {
         state.posts.push(action.payload);
       },
-      prepare(title, content, userId) {
+      prepare(title, content, userId): { payload: Posts } {
         return {
           payload: {
-            id: nanoid(),
-            title,
-            content,
+            api: [
+              {
+                id: nanoid(),
+                title,
+                body: content,
+                userId,
+              },
+            ],
+            error: "",
             date: new Date().toISOString(),
-            userId,
             reactions: {
               thumbsup: 0,
               wow: 0,
@@ -97,7 +120,7 @@ const postsSlice = createSlice({
         state.status = "succeeded";
         //adding date and reactions
         let min = 1;
-        const loadedPosts = action.payload.map((post) => {
+        const loadedPosts = (action.payload as Posts[]).map((post) => {
           post.date = sub(new Date(), { minutes: min++ }).toISOString();
           post.reactions = {
             thumbsup: 0,
