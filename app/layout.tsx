@@ -1,5 +1,9 @@
 import "./globals.css";
 import { Providers } from "./GlobalRedux/provider";
+import { store } from "./GlobalRedux/store";
+import { fetchUsers } from "./GlobalRedux/Features/users/userSlice";
+
+store.dispatch(fetchUsers());
 
 export const metadata = {
   title: "Create Next App",

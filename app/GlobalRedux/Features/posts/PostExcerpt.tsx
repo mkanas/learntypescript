@@ -3,9 +3,9 @@
 import PostAuthor from "./PostAuthor";
 import TimeAgo from "./TimeAgo";
 import ReactionButton from "./ReactionButton";
-import { PostsFake } from "./postsSlice";
+import { Posts } from "./postsSlice";
 
-const PostExcerpt = ({ post }: { post: PostsFake }) => {
+const PostExcerpt = ({ post }: { post: Posts }) => {
   return (
     <article className="border-2 border-black rounded-md my-4 py-2 px-3">
       <h1 className="font-bold text-lg"> {post.title}</h1>

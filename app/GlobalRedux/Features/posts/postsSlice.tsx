@@ -10,17 +10,11 @@ import axios from "axios";
 import { RootState } from "../../store";
 import { sub } from "date-fns";
 
-export interface PostsFake {
-  id: number;
+export interface Posts {
   title: string;
   body: string;
   userId: string;
-  date: string;
-}
-
-export interface Posts {
   id: string;
-  api: PostsFake[];
   date: string;
   error: string;
   reactions: {
@@ -29,15 +23,16 @@ export interface Posts {
     heart: number;
     rocket: number;
     coffee: number;
+    [key: string]: number;
   };
 }
 
-const POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
+const POSTS_URL = "https://jsonplaceholder.typicode.com/posts?_limit=20";
 
 interface InitialState {
   posts: Posts[];
   status: "idle" | "succeeded" | "failed" | "loading";
-  error: null | string | undefined;
+  error?: null | string;
 }
 
 const initialState: InitialState = {
@@ -76,14 +71,10 @@ const postsSlice = createSlice({
       prepare(title, content, userId): { payload: Posts } {
         return {
           payload: {
-            api: [
-              {
-                id: nanoid(),
-                title,
-                body: content,
-                userId,
-              },
-            ],
+            id: nanoid(),
+            title,
+            body: content,
+            userId,
             error: "",
             date: new Date().toISOString(),
             reactions: {

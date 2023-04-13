@@ -12,8 +12,6 @@ const reactionsEmoji = {
   coffee: "☕",
 };
 
-import React from "react";
-
 const ReactionButton = ({ post }: { post: Posts }) => {
   const dispatch = useDispatch();
   const reactionButtons = Object.entries(reactionsEmoji).map(
